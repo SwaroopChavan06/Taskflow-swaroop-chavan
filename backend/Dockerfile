@@ -6,13 +6,15 @@ RUN apk add --no-cache git ca-certificates tzdata
 
 WORKDIR /app
 
-# Copy module manifests first so Docker caches the dependency layer separately.
-# go.sum* — the asterisk makes go.sum optional on a fresh clone;
-# go mod tidy generates it on first build.
-COPY go.mod go.sum* ./
-RUN go mod tidy
+# ── Dependency layer (cached until go.mod changes) ────────────────���───────────
+# go mod download reads go.mod and fetches every listed module into the module
+# cache, creating go.sum from scratch if it doesn't exist.
+# Unlike go mod tidy, it does NOT need source files to run — so it works
+# correctly even when go.sum is not committed to the repo.
+COPY go.mod ./
+RUN go mod download
 
-# Copy remaining source and compile a fully static binary.
+# ── Build layer ───────────────────────────────────────────────────────────────
 COPY . .
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 \
     go build \
