@@ -1,16 +1,8 @@
 # Environment
 .env
 
-# Go
-backend/bin/
-backend/tmp/
-
-# Node
-frontend/node_modules/
-frontend/dist/
-
-# Docker
-*.log
+# Frontend (not part of this submission)
+frontend/
 
 # OS
 .DS_Store
